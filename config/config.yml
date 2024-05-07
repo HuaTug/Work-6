@@ -1,0 +1,17 @@
+mysql:
+  addr: 192.168.17.128:3306
+  username: root
+  password: root
+  charset: utf8mb4
+  database: note
+
+redis:
+  addr: 192.168.17.128:6379
+
+rabbitmq:
+  addr: 192.168.17.128:5672
+  username: guest
+  password: guest
+
+etcd:
+  addr: 192.168.17.128:2379
