@@ -140,4 +140,7 @@ This is a microservice refactoring project that uses the Kitex framework and RPC
 
 ## 下一阶段
 
+Kitex
+
+k8s 
 
