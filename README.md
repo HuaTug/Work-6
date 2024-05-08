@@ -108,6 +108,13 @@ This is a microservice refactoring project that uses the Kitex framework and RPC
 完成Es的基本增删改查操作 同时将其运用到service中 查看效果
 ```
 
+`5.7号`
+```
+使用Kitex完成了项目的重构 同时开始尝试了解其服务注册等内容
+```
+
+`
+
 ### 需要优化的地方：
 
 `Redis的引入`
