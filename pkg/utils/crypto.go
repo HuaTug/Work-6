@@ -31,10 +31,10 @@ func Crypt(password string) (string, error) {
 }
 
 // VerifyPassword Verify the password is consistent with the hashed password in the database
-func VerifyPassword(password, hashedPassword string) bool {
+func VerifyPassword(password, hashedPassword string) (error,bool) {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err != nil {
-		return false
+		return err,false
 	}
-	return true
+	return nil,true
 }

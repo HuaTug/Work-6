@@ -5,6 +5,7 @@ import (
 
 	"HuaTug.com/cmd/user/dal/db"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/pkg/errors"
 )
 
 type DeleteUserService struct {
@@ -18,7 +19,7 @@ func NewDeleteUSerService(ctx context.Context) *DeleteUserService {
 func (v *DeleteUserService) DeleteUser(userId int64) error {
 	if err := db.DeleteUser(v.ctx, userId); err != nil {
 		hlog.Info(err)
-		return err
+		return errors.WithMessage(err,"dao.DeleteUser failed")
 	}
 	return nil
 }

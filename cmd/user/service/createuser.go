@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 
-	"HuaTug.com/cache"
 	"HuaTug.com/cmd/user/dal/db"
+	"HuaTug.com/config/cache"
 	"HuaTug.com/kitex_gen/users"
 	"HuaTug.com/pkg/utils"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/pkg/errors"
 )
 
 type CreateUserService struct {
@@ -23,15 +23,13 @@ func (v *CreateUserService) CreateUser(req *users.CreateUserRequest) error {
 	var flag bool
 	//var wg sync.WaitGroup
 	if _, err, flag = db.CheckUser(v.ctx, req.UserName, req.Password); !flag {
-		hlog.Info("用户重复注册")
-		return err
+		return errors.WithMessage(err, "User duplicate registration")
 	}
 	key := "user_id"
 	id := cache.GenerateID(key)
 	passWord, err := utils.Crypt(req.Password)
 	if err != nil {
-		hlog.Info(err)
-		return err
+		return errors.WithMessage(err, "Password fail to crypt")
 	}
 	return db.CreateUser(v.ctx, &users.User{
 		UserId:   id,

@@ -4,11 +4,11 @@ import (
 	"context"
 	"sync"
 
-	"HuaTug.com/cache"
-	relation "HuaTug.com/cache"
 	"HuaTug.com/cmd/favorite/dal/db"
+	"HuaTug.com/config/cache"
 	"HuaTug.com/kitex_gen/favorites"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/pkg/errors"
 )
 
 type FavoriteService struct {
@@ -53,13 +53,13 @@ func (s *FavoriteService) Favorite(ctx context.Context, req *favorites.FavoriteR
 	//ToDo:实现对视频的点赞缓存操作
 	go func() {
 		defer wg.Done()
-		relation.CacheChangeUserCount(2, add, "like")
+		cache.CacheChangeUserCount(2, add, "like")
 	}()
 	wg.Wait()
 	if err, ok := <-errChan; ok && err != nil {
 		resp.Code = consts.StatusBadRequest
 		resp.Msg = "Fail to Favorite"
-		return resp, err
+		return resp, errors.WithMessage(err,"dao.Favorite failed")
 	}
 	resp.Code = consts.StatusOK
 	resp.Msg = "Success to Favorite"

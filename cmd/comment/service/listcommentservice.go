@@ -6,6 +6,7 @@ import (
 	"HuaTug.com/cmd/comment/dal/db"
 	"HuaTug.com/kitex_gen/comments"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/pkg/errors"
 )
 
 type ListCommentService struct {
@@ -23,7 +24,7 @@ func (v *ListCommentService) ListComment(ctx context.Context, req *comments.List
 	var err error
 	comment, total, err = db.ListComment(v.ctx, req)
 	if err != nil {
-		return resp, err
+		return resp, errors.WithMessage(err, "dao.ListComment failed")
 	} else {
 		resp.Total = total
 		resp.Comments = comment

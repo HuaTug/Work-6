@@ -3,7 +3,7 @@ package main
 import (
 	"net"
 
-	"HuaTug.com/cache"
+	"HuaTug.com/config/cache"
 	"HuaTug.com/cmd/comment/dal"
 	comment "HuaTug.com/kitex_gen/comments/commentservice"
 	"HuaTug.com/pkg/bound"

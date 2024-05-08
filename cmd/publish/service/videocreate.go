@@ -5,7 +5,7 @@ import (
 
 	"HuaTug.com/cmd/publish/dal/db"
 	"HuaTug.com/kitex_gen/publishs"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/pkg/errors"
 )
 
 type VideoCreateService struct {
@@ -16,11 +16,10 @@ func NewVideoCreateService(ctx context.Context) *VideoCreateService {
 	return &VideoCreateService{ctx: ctx}
 }
 
-func (v *VideoCreateService)VideoCreate(ctx context.Context,req *publishs.VideoCreateRequest)error{
-	err:=db.VideoCreate(v.ctx,req)
-	if err!=nil{
-		hlog.Info(err)
-		return err
+func (v *VideoCreateService) VideoCreate(ctx context.Context, req *publishs.VideoCreateRequest) error {
+	err := db.VideoCreate(v.ctx, req)
+	if err != nil {
+		return errors.WithMessage(err, "dao.VideoCreate failed")
 	}
-	return nil	
+	return nil
 }

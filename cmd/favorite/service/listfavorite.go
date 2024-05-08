@@ -8,6 +8,7 @@ import (
 	"HuaTug.com/kitex_gen/favorites"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/pkg/errors"
 )
 
 type ListFavoriteService struct {
@@ -23,16 +24,23 @@ func (s *ListFavoriteService) ListFavorite(ctx context.Context, req *favorites.L
 	var favs []*favorites.Favorite
 	var users []*favorites.User
 	var wg sync.WaitGroup
+	var err1,err2 error
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		users = db.UserExist(s.ctx, req.UserId)
+		users,err1 = db.UserExist(s.ctx, req.UserId)
 	}()
 	go func() {
 		defer wg.Done()
-		favs = db.FavoriteExist(s.ctx, req.UserId)
+		favs ,err2= db.FavoriteExist(s.ctx, req.UserId)
 	}()
 	wg.Wait()
+	if err1!=nil{
+		return resp,errors.WithMessage(err1,"dao.UserExist failed")
+	}
+	if err2!=nil{
+		return resp,errors.WithMessage(err2,"dao.FavoriteExist failed")
+	}
 	resp.Favs = favs
 	resp.Users = users
 	if len(users) == 0 {

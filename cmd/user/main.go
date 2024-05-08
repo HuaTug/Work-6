@@ -18,8 +18,9 @@ package main
 import (
 	"net"
 
-	"HuaTug.com/cache"
 	"HuaTug.com/cmd/user/dal"
+	"HuaTug.com/config"
+	"HuaTug.com/config/cache"
 	user "HuaTug.com/kitex_gen/users/userservice"
 	"HuaTug.com/pkg/bound"
 	"HuaTug.com/pkg/constants"
@@ -38,6 +39,7 @@ func Init() {
 }
 
 func main() {
+	config.Init()
 	//r, err := etcd.NewEtcdRegistry([]string{config.ConfigInfo.Etcd.Addr})
 	r, err := etcd.NewEtcdRegistry([]string{"localhost:2379"})
 	if err != nil {

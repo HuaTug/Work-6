@@ -5,6 +5,7 @@ import (
 
 	"HuaTug.com/cmd/user/dal/db"
 	"HuaTug.com/kitex_gen/users"
+	"github.com/pkg/errors"
 )
 
 type UpdateUserService struct {
@@ -22,7 +23,7 @@ func (v *UpdateUserService) UpdateUser(req *users.UpdateUserRequest) (err error)
 		Password: req.Password,
 	}
 	if err:=db.UpdateUser(v.ctx,user);err!=nil{
-		return err
+		return errors.WithMessage(err,"dao.UpdateUser failed")
 	}
 	return nil
 }

@@ -2,12 +2,12 @@ package db
 
 import (
 	"context"
-	"errors"
 
 	"HuaTug.com/kitex_gen/favorites"
 	"HuaTug.com/kitex_gen/users"
 	"HuaTug.com/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -29,7 +29,11 @@ GORM 会自动调用 users（即 *User 类型）的 TableName 方法，得到 "u
 */
 
 func CreateUser(ctx context.Context, user *users.User) error {
-	return DB.WithContext(ctx).Model(&users.User{}).Create(user).Error
+	if err := DB.WithContext(ctx).Model(&users.User{}).Create(user); err != nil {
+		//ToDo:分层处理err
+		return errors.Wrapf(err.Error, "CreateUser failed,err: %v", err)
+	}
+	return nil
 }
 
 func CheckUser(ctx context.Context, username, password string) (users.User, error, bool) {
@@ -43,8 +47,8 @@ func CheckUser(ctx context.Context, username, password string) (users.User, erro
 		logrus.Info("正在创建新用户")
 		return user, nil, true
 	}
-	if flag := utils.VerifyPassword(password, user.Password); !flag {
-		return user, errors.New("密码错误"), true
+	if err, flag := utils.VerifyPassword(password, user.Password); !flag {
+		return user, errors.Wrapf(err, "Password Wrong,err:%v", err), true
 	}
 	return user, nil, false
 }
@@ -52,7 +56,7 @@ func CheckUser(ctx context.Context, username, password string) (users.User, erro
 func CheckUserExistById(ctx context.Context, userId int64) (bool, error) {
 	var user users.User
 	if err := DB.WithContext(ctx).Where("id=?", userId).Find(&user).Error; err != nil {
-		return false, err
+		return false, errors.Wrapf(err, "User not exist,err:%v", err)
 	}
 	if user == (users.User{}) {
 		return false, nil
@@ -60,11 +64,17 @@ func CheckUserExistById(ctx context.Context, userId int64) (bool, error) {
 	return true, nil
 }
 func DeleteUser(ctx context.Context, userId int64) error {
-	return DB.WithContext(ctx).Where("user_id = ?", userId).Delete(&users.User{}).Error
+	if err := DB.WithContext(ctx).Where("user_id = ?", userId).Delete(&users.User{}); err != nil {
+		return errors.Wrapf(err.Error, "Delete user failed,err: %v", err)
+	}
+	return nil
 }
 
 func UpdateUser(ctx context.Context, user *users.User) error {
-	return DB.WithContext(ctx).Where("user_id=?", user.UserId).Updates(user).Error
+	if err := DB.WithContext(ctx).Where("user_id=?", user.UserId).Updates(user); err != nil {
+		return errors.Wrapf(err.Error, "Update user failed,err: %v", err)
+	}
+	return nil
 }
 
 func QueryUser(ctx context.Context, keyword *string, page, pageSize int64) ([]*users.User, int64, error) {
@@ -74,28 +84,28 @@ func QueryUser(ctx context.Context, keyword *string, page, pageSize int64) ([]*u
 	}
 	var total int64
 	if err := db.Count(&total).Error; err != nil {
-		return nil, total, err
+		return nil, total, errors.Wrapf(err, "QueryUser count failed,err:%v", err)
 	}
 	var res []*users.User
-	if err := db.Limit(int(pageSize)).Offset(int(pageSize * (page - 1))).Find(&res).Error; err != nil {
-		return nil, total, err
+	if err := db.Limit(int(pageSize)).Offset(int(pageSize * (page - 1))).Find(&res); err != nil {
+		return nil, total, errors.Wrapf(err.Error, "Limit failed,err:%v", err)
 	}
 	return res, total, nil
 }
 
 func GetUser(ctx context.Context, userId int64) (*users.User, error) {
 	var user *users.User
-	if err := DB.WithContext(ctx).Model(users.User{}).Where("user_id=?", userId).Find(&user).Error; err != nil {
+	if err := DB.WithContext(ctx).Model(users.User{}).Where("user_id=?", userId).Find(&user); err != nil {
 		logrus.Info(err)
-		return user, err
+		return user, errors.Wrapf(err.Error, "GetUser failed,err:%v", err)
 	}
 	return user, nil
 }
 
-func UserExist(ctx context.Context, uid int64) []*favorites.User {
+func UserExist(ctx context.Context, uid int64) ([]*favorites.User, error) {
 	var user []*favorites.User
-	if err:=DB.WithContext(ctx).Model(&users.User{}).Where("user_id=?", uid).Find(&user);err!=nil{
-		hlog.Info(err)
+	if err := DB.WithContext(ctx).Model(&users.User{}).Where("user_id=?", uid).Find(&user); err != nil {
+		return nil, errors.Wrapf(err.Error, "User not exist,err:%v", err)
 	}
-	return user
+	return user, nil
 }

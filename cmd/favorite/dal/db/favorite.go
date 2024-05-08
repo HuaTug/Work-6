@@ -6,21 +6,19 @@ import (
 	"HuaTug.com/kitex_gen/favorites"
 	"HuaTug.com/kitex_gen/users"
 	"HuaTug.com/kitex_gen/videos"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/pkg/errors"
 )
 
 func FavoriteAction(ctx context.Context, favorite *favorites.Favorite) error {
 	if err := DB.WithContext(ctx).Model(&favorites.Favorite{}).Create(favorite).Error; err != nil {
-		hlog.Info(err)
-		return err
+		return errors.Wrapf(err, "FavoriteAction failed,err:%v", err)
 	}
 	return nil
 }
 
 func UnFavoriteAction(ctx context.Context, userId, videoId int64) error {
 	if err := DB.WithContext(ctx).Model(&favorites.Favorite{}).Where("user_id=? And video_id=?", userId, videoId).Delete(&favorites.Favorite{}).Error; err != nil {
-		hlog.Info(err)
-		return err
+		return errors.Wrapf(err, "UnFavoriteAction failed,err:%v", err)
 	}
 	return nil
 }
@@ -37,16 +35,18 @@ func Judge(ctx context.Context, VideoId int64) bool {
 	return true
 }
 
-func FavoriteExist(ctx context.Context, uid int64) []*favorites.Favorite {
+func FavoriteExist(ctx context.Context, uid int64) ([]*favorites.Favorite, error) {
 	var fav []*favorites.Favorite
-	DB.WithContext(ctx).Model(&favorites.Favorite{}).Where("user_id=?", uid).Find(&fav)
-	return fav
+	if err := DB.WithContext(ctx).Model(&favorites.Favorite{}).Where("user_id=?", uid).Find(&fav).Error; err != nil {
+		return fav, errors.Wrapf(err, "FavoriteExist failed,err:%v", err)
+	}
+	return fav, nil
 }
 
-func UserExist(ctx context.Context, uid int64) []*favorites.User {
+func UserExist(ctx context.Context, uid int64) ([]*favorites.User, error) {
 	var user []*favorites.User
-	if err := DB.WithContext(ctx).Model(&users.User{}).Where("user_id=?", uid).Find(&user); err != nil {
-		hlog.Info(err)
+	if err := DB.WithContext(ctx).Model(&users.User{}).Where("user_id=?", uid).Find(&user).Error; err != nil {
+		return user, errors.Wrapf(err, "UserExist failed,err:%v", err)
 	}
-	return user
+	return user, nil
 }

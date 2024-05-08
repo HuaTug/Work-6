@@ -4,12 +4,12 @@ import (
 	"context"
 	"sync"
 
-	"HuaTug.com/cache"
-	relation "HuaTug.com/cache"
 	"HuaTug.com/cmd/favorite/dal/db"
+	"HuaTug.com/config/cache"
 	"HuaTug.com/kitex_gen/favorites"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/pkg/errors"
 )
 
 type UnFavoriteService struct {
@@ -38,11 +38,11 @@ func (s *UnFavoriteService) UnFavorite(ctx context.Context, req *favorites.Favor
 		hlog.Info(err)
 		resp.Code = consts.StatusBadRequest
 		resp.Msg = "Fail to UnFavorite"
-		return resp, err
+		return resp, errors.WithMessage(err,"dao.UnFavoriteAction failed")
 	}
 	go func() {
 		defer wg.Done()
-		relation.CacheChangeUserCount(toUid, sub, "unlike")
+		cache.CacheChangeUserCount(toUid, sub, "unlike")
 	}()
 	wg.Wait()
 	resp.Code = consts.StatusOK

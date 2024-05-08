@@ -6,6 +6,31 @@ This is a microservice refactoring project that uses the Kitex framework and RPC
 
 完整项目目录: /Tree.md
 
+## 准备工作
+
+运行kitex_gen.sh脚本文件 [ ./kitex_gen.sh] 
+
+
+#### 进行Makefile指令的初始化操作 
+
+- make -B idl
+#### 用于生成kitex框架下的idl文件对应的各种服务
+
+- make -B go 
+
+#### 完成运行环境的搭建与将.go源文件编译为可执行的二进制文件
+- make api
+- make user
+- make video
+- make publish
+- make comment
+- make relation
+- make favorite
+
+#### 以上的几种指令用于启动各个不同的服务 
+
+
+
 `docker`
 ```
 
@@ -108,11 +133,14 @@ This is a microservice refactoring project that uses the Kitex framework and RPC
 完成Es的基本增删改查操作 同时将其运用到service中 查看效果
 ```
 
-`5.7号`
+`5.5号`
 ```
 使用Kitex完成了项目的重构 同时开始尝试了解其服务注册等内容
 ```
-
+`5.6号`
+```
+根据上次答辩遗留的error分层处理进行了项目的完善
+```
 `
 
 ### 需要优化的地方：

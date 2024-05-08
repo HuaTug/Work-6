@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"HuaTug.com/cache"
+	"HuaTug.com/config/cache"
 	"HuaTug.com/cmd/relation/dal/db"
 	"HuaTug.com/kitex_gen/relations"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
