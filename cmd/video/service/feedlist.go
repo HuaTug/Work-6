@@ -3,10 +3,11 @@ package service
 import (
 	"context"
 
-	"HuaTug.com/cache"
 	"HuaTug.com/cmd/video/dal/db"
+	"HuaTug.com/config/cache"
 	"HuaTug.com/kitex_gen/videos"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/pkg/errors"
 )
 
 
@@ -21,8 +22,7 @@ func NewFeedListService(ctx context.Context)*FeedListService{
 //这里的v指向方法，用于传递ctx上下文
 func (v *FeedListService)FeedList(req *videos.FeedServiceRequest)([]*videos.Video,error){
 	if video,err:=db.Feedlist(v.ctx,req);err!=nil{
-		hlog.Info(err)
-		return video,err
+		return video,errors.WithMessage(err,"dao.FeedList failed")
 	}else{
 		
 		cache.Insert(video)

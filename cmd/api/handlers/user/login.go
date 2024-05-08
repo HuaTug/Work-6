@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"HuaTug.com/cmd/api/rpc"
-	jwt "HuaTug.com/cmd/mw"
+	jwt "HuaTug.com/pkg"
 	"HuaTug.com/kitex_gen/users"
 	"HuaTug.com/pkg/errno"
 

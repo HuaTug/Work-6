@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"HuaTug.com/config"
 	"HuaTug.com/kitex_gen/users"
 	"HuaTug.com/kitex_gen/users/userservice"
 	"github.com/cloudwego/kitex/client"
@@ -17,7 +18,9 @@ import (
 var userClient userservice.Client
 
 func initUserRpc() {
-	r, err := etcd.NewEtcdResolver([]string{"localhost:2379"})
+	config.Init()
+	//调用文件的位置则是main函数的起始位置
+	r, err := etcd.NewEtcdResolver([]string{config.ConfigInfo.Etcd.Addr})
 	if err != nil {
 		klog.Info(err)
 	}

@@ -3,7 +3,7 @@ package main
 import (
 	"net"
 
-	"HuaTug.com/cache"
+	"HuaTug.com/config/cache"
 	"HuaTug.com/cmd/favorite/dal"
 	favorite "HuaTug.com/kitex_gen/favorites/favoriteservice"
 	"HuaTug.com/pkg/bound"

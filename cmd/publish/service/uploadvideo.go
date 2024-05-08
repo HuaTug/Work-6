@@ -5,17 +5,16 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"sync"
 	"time"
 
-	"HuaTug.com/cache"
 	"HuaTug.com/cmd/publish/dal/db"
+	"HuaTug.com/config/cache"
 	"HuaTug.com/kitex_gen/publishs"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -44,8 +43,7 @@ func (v *Uploadvideoservice) UploadFile(req *publishs.UpLoadVideoRequest) error 
 		Secure: false,
 	})
 	if err != nil {
-		hlog.Info(err)
-		return err
+		return errors.WithMessage(err, "Minio server init failed")
 	}
 	bucketName := req.BucketName
 	var filePath string
@@ -64,8 +62,7 @@ func (v *Uploadvideoservice) UploadFile(req *publishs.UpLoadVideoRequest) error 
 	fmt.Println(filePath)
 	src, err := os.Open(filePath)
 	if err != nil {
-		logrus.Info("Open文件出错" + "err")
-		return err
+		return errors.WithMessage(err, "Failed to open file")
 	}
 	defer src.Close()
 
@@ -77,17 +74,15 @@ func (v *Uploadvideoservice) UploadFile(req *publishs.UpLoadVideoRequest) error 
 			logrus.Printf("Bucket %s already exists\n", bucketName)
 		} else {
 			err = minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
-			if err != nil {
-				log.Fatalln(err)
-			}
 		}
 	}()
 	wg.Wait()
-
+	if err != nil {
+		return errors.WithMessage(err, "MakeBucket failed")
+	}
 	uploadID, err := minioClient.NewMultipartUpload(context.Background(), bucketName, objectName, minio.PutObjectOptions{})
 	if err != nil {
-		logrus.Info("First Error:", err)
-		return err
+		return errors.WithMessage(err, "MultipartUpload file failed")
 	}
 	var parts []minio.ObjectPart
 	buffer := make([]byte, chunkSize)
@@ -98,8 +93,7 @@ func (v *Uploadvideoservice) UploadFile(req *publishs.UpLoadVideoRequest) error 
 				break
 			} else {
 				// 其他错误，记录错误信息并返回
-				logrus.Info("Error while reading file:", err)
-				return err
+				return errors.WithMessage(err, "Error while reading file:")
 			}
 		}
 		if n == 0 {
@@ -109,8 +103,7 @@ func (v *Uploadvideoservice) UploadFile(req *publishs.UpLoadVideoRequest) error 
 		//将每一个切片进行并发的上传
 		part, err := minioClient.PutObjectPart(context.Background(), bucketName, objectName, uploadID, partNumber, bytes.NewReader(buffer[:n]), int64(n), minio.PutObjectPartOptions{})
 		if err != nil {
-			logrus.Info("Third Error:", err)
-			return err
+			return errors.WithMessage(err, "Fail to uploadfile")
 		}
 
 		/*ToDo: 虽然src.Read() 是按顺序读取文件的，但在每次读取之后，都会启动一个 goroutine 来并发地执行上传操作，
@@ -156,8 +149,7 @@ func (v *Uploadvideoservice) UploadFile(req *publishs.UpLoadVideoRequest) error 
 	if err := db.VideoCreate(v.ctx, &publishs.VideoCreateRequest{
 		Video: publish,
 	}); err != nil {
-		hlog.Info("Fail to Write Sql")
-		return err
+		return errors.WithMessage(err, "Fail to Write Sql")
 	}
 	logrus.Info("文件上传成功")
 	return nil

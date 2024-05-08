@@ -3,7 +3,7 @@ package main
 import (
 	"net"
 
-	"HuaTug.com/cache"
+	"HuaTug.com/config/cache"
 	"HuaTug.com/cmd/publish/dal"
 	publish "HuaTug.com/kitex_gen/publishs/uploadvideoservice"
 	"HuaTug.com/pkg/bound"

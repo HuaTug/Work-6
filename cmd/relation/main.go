@@ -3,7 +3,7 @@ package main
 import (
 	"net"
 
-	"HuaTug.com/cache"
+	"HuaTug.com/config/cache"
 	"HuaTug.com/cmd/relation/dal"
 	relation "HuaTug.com/kitex_gen/relations/followservice"
 	"HuaTug.com/pkg/bound"

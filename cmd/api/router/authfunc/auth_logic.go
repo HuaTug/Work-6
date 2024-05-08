@@ -3,7 +3,7 @@ package authfunc
 import (
 	"context"
 
-	jwt "HuaTug.com/cmd/mw"
+	jwt "HuaTug.com/pkg"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"

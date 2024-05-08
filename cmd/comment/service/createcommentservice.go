@@ -4,11 +4,12 @@ import (
 	"context"
 	"time"
 
-	"HuaTug.com/cache"
 	"HuaTug.com/cmd/comment/dal/db"
+	"HuaTug.com/config/cache"
 	"HuaTug.com/kitex_gen/comments"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/pkg/errors"
 )
 
 type CreateCommentService struct {
@@ -38,7 +39,7 @@ func (v *CreateCommentService) CreateComment(req *comments.CreateCommentRequest)
 				hlog.Info(err)
 				resp.Code = consts.StatusBadRequest
 				resp.Msg = "Fail to Create Comment"
-				return resp, err
+				return resp, errors.WithMessage(err,"dao.CreatComment failed")
 			}
 			resp.Code = consts.StatusOK
 			resp.Msg = "Success to Create Comment"
@@ -48,7 +49,7 @@ func (v *CreateCommentService) CreateComment(req *comments.CreateCommentRequest)
 				hlog.Info(err)
 				resp.Code = consts.StatusBadRequest
 				resp.Msg = "Fail to Create Comment"
-				return resp, err
+				return resp, errors.WithMessage(err,"dao.CreateComment failed")
 			}
 		}
 	} else {
@@ -56,11 +57,14 @@ func (v *CreateCommentService) CreateComment(req *comments.CreateCommentRequest)
 			hlog.Info(err)
 			resp.Code = consts.StatusBadRequest
 			resp.Msg = "Fail to Create Comment"
-			return resp, err
+			return resp, errors.WithMessage(err,"dao.CreateComment failed")
 		}
 	}
 	//获取此时这张表中的最大主键值
-	commentId := db.GetMaxId(v.ctx) 
+	commentId,err := db.GetMaxId(v.ctx)
+	if err!=nil{
+		return resp,errors.WithMessage(err,"dao.GetMaxId failed")
+	}
 	hlog.Info(commentId)
 	go func() {
 		err := cache.CacheSetCommentVideo(req.VideoId, commentId)

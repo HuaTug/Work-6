@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"HuaTug.com/cmd/api/rpc"
-	jwt "HuaTug.com/cmd/mw"
+	jwt "HuaTug.com/pkg"
 	"HuaTug.com/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/middlewares/server/recovery"
@@ -99,6 +99,7 @@ func main() {
 	   		c.String(consts.StatusOK, "no method")
 	   	}) */
 	register(r)
+	
 	r.Spin()
 
 }

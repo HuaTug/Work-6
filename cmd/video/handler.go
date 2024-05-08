@@ -7,6 +7,7 @@ import (
 	"HuaTug.com/kitex_gen/videos"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/pkg/errors"
 )
 
 type VideoServiceImpl struct{}
@@ -15,7 +16,8 @@ func (s *VideoServiceImpl) FeedService(ctx context.Context, req *videos.FeedServ
 	resp = new(videos.FeedServiceResponse)
 	var video []*videos.Video
 	if video, err = service.NewFeedListService(ctx).FeedList(req); err != nil {
-		hlog.Info(err)
+		hlog.CtxErrorf(ctx, "service.FeedService failed,original error:%v", errors.Cause(err))
+		hlog.CtxErrorf(ctx, "stack trace: \n%+v\n", err)
 		resp.Code = consts.StatusBadRequest
 		resp.Msg = "Fail to Get VideoFeed!"
 		resp.VideoList = video
@@ -32,7 +34,8 @@ func (s *VideoServiceImpl) VideoFeedList(ctx context.Context, req *videos.VideoF
 	var video []*videos.Video
 	var count int64
 	if video, count, err = service.NewVideoListService(ctx).VideoList(req); err != nil {
-		hlog.Info(err)
+		hlog.CtxErrorf(ctx, "service.VideoFeedList failed,original error:%v", errors.Cause(err))
+		hlog.CtxErrorf(ctx, "stack trace: \n%+v\n", err)  
 		resp.Code = consts.StatusBadRequest
 		resp.Msg = "Fail to Get VideoList!"
 		resp.VideoList = video
@@ -51,7 +54,8 @@ func (s *VideoServiceImpl) VideoSearch(ctx context.Context, req *videos.VideoSea
 	var video []*videos.Video
 	var count int64
 	if video, count, err = service.NewVideoSearchService(ctx).VideoSearch(req); err != nil {
-		hlog.Info(err)
+		hlog.CtxErrorf(ctx, "service.VideoSearch failed,original error:%v", errors.Cause(err))
+		hlog.CtxErrorf(ctx, "stack trace: \n%+v\n", err)  
 		resp.Code = consts.StatusBadRequest
 		resp.Msg = "Fail to Get VideoFeed!"
 		resp.VideoSearch = video
@@ -72,14 +76,15 @@ func (s *VideoServiceImpl) VideoPopular(ctx context.Context, req *videos.VideoPo
 	resp = new(videos.VideoPopularResponse)
 	var video []*videos.Video
 	if video, err = service.NewVideoPopularService(ctx).VideoPopular(req); err != nil {
-		hlog.Info(err)
+		hlog.CtxErrorf(ctx, "service.VideoPopular failed,original error:%v", errors.Cause(err))
+		hlog.CtxErrorf(ctx, "stack trace: \n%+v\n", err)  
 		resp.Code = consts.StatusBadRequest
 		resp.Msg = "Fail to Get VideoFeed!"
-		resp.Popular=video
+		resp.Popular = video
 		return resp, err
 	}
 	resp.Code = consts.StatusOK
 	resp.Msg = "Get VideoFeed Success"
-	resp.Popular=video
+	resp.Popular = video
 	return resp, nil
 }
